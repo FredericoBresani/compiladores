@@ -1,2 +1,19 @@
-hey ho
-    How must that go?
+#include <IOApi>
+#include <math.h>
+
+int n;
+
+print("Quantos numeros voce quer imprimir?");
+read("%i", &n);
+
+int numeros[n];
+
+for (int i = 0; i < n; i++) {
+    if (i == 0) {
+        numeros[i] = -1;
+    } else if (i == n) {
+        numeros[i] = -2; 
+    } else {
+        numeros[i] = pow(i, 2);
+    }
+} 
