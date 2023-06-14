@@ -15,15 +15,12 @@ class Lexer:
 
     def nextCharacter(self) -> bool:
         token = None
-        while True:
-            char = self.source[self.cursorEnd]
-            self.cursorEnd += 1
-            if char != ' ' and char != ';':
-                break
-            elif char == '+':
-                token = Token(TokenTypes.PLUS, char)
-                break
-            elif char == '-'
+        char = self.source[self.cursorEnd]
+        if char != ' ' and char != ';':
+            token = Token(TokenTypes.IDENTIFIER, self.source[self.cursorBegin: self.cursorEnd])
+        elif char == '+':
+            token = Token(TokenTypes.PLUS, char)
+        elif char == '-'
             
 
 
