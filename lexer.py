@@ -8,19 +8,62 @@ class Lexer:
         self.cursorEnd = 0
         
 
-    def nextToken(self) -> None:
-        self.nextCharacter()
-        self.cursorEnd += 1
-        self.cursorBegin = self.cursorEnd 
-
-    def nextCharacter(self) -> bool:
+    def nextToken(self):
         token = None
         char = self.source[self.cursorEnd]
-        if char != ' ' and char != ';':
-            token = Token(TokenTypes.IDENTIFIER, self.source[self.cursorBegin: self.cursorEnd])
+        if char != ';':
+            token = Token(TokenTypes.SEMICOLON, char)
         elif char == '+':
             token = Token(TokenTypes.PLUS, char)
-        elif char == '-'
+        elif char == '-':
+            token = Token(TokenTypes.MINUS, char)
+        elif char == ']':
+            token = Token(TokenTypes.SQUARE_BRACKETS, char)
+        elif char == '[':
+            token = Token(TokenTypes.SQUARE_BRACKETS, char)
+        elif char == '/':
+            token = Token(TokenTypes.DIVIDE, char)
+        elif char == '#':
+            token = Token(TokenTypes.HASHTAG, char)
+        elif char == '&':
+            token = Token(TokenTypes.REFERENCE, char)
+        elif char == '%':
+            token = Token(TokenTypes.REST_DIVIDE, char)
+        elif char == '}':
+            token = Token(TokenTypes.CURLY_BRACES, char)
+        elif char == '{':
+            token = Token(TokenTypes.CURLY_BRACES, char)
+        elif char == '(':
+            token = Token(TokenTypes.PARENTHESES, char)
+        elif char == ')':
+            token = Token(TokenTypes.PARENTHESES, char)
+        elif char == ';':
+            token = Token(TokenTypes.SEMICOLON, char)
+        elif char == ':':
+            token = Token(TokenTypes.COLON, char)
+        elif self.isLetter(char):
+            if self.nextCharacter() == 'f':
+
+
+
+
+        self.cursorEnd += 1
+        self.cursorBegin = self.cursorEnd 
+        return token
+
+    def nextCharacter(self):
+        self.cursorEnd += 1
+        return self.source[self.cursorEnd]
+    
+    def isLetter(self, c):
+        if (ord(c) >= 65 and ord(c) <= 90) or ord(c) == 95 or (ord(c) >= 97 and ord(c) <= 122):
+            return True
+        return False
+
+    def isDigit(self, c):
+        if ord(c) >= 48 and ord(c) <= 57:
+            return True
+        return False
             
 
 
@@ -34,18 +77,17 @@ class Token:
 
 class TokenTypes(Enum):
     EOF = -1
+    LITERAL = 1
+    IDENTIFIER = 2
+    LIB = 112
     # RESERVER WORDS ( (100, 200] )
     INCLUDE = 100
-    LINE_BREAK = 101
-    LITERAL = 102
-    ASSIGN = 103
     ELSE = 104
     IF = 105
-    ELSE_IF = 106
     WHILE = 107
     FOR = 108
-    IDENTIFIER = 109
-    # DATA TYPE ( (200, 300] )
+    PRINT = 110
+    POW = 111 
     INT = 200
     FLOAT = 201
     DOUBLE = 202
@@ -54,11 +96,16 @@ class TokenTypes(Enum):
     # ESPECIAL SYMBOLS ( (300, 400] )
     DOT = 300
     HYFEN = 301
-    HASHTAG = 302
+    COLON = 302
     SEMICOLON = 303
     PARENTHESES = 304
     CURLY_BRACES = 305
     SQUARE_BRACKETS = 306
+    QUESTION_MARK = 307
+    HASHTAG = 308
+    REFERENCE = 309
+    LINE_BREAK = 310
+    ASSIGN = 311
     # OPERATORS ( (400, 500] )
     EQUAL = 400
     LESS = 401
@@ -70,3 +117,5 @@ class TokenTypes(Enum):
     DIVIDE = 407
     MULTIPLY = 408
     REST_DIVIDE = 409
+    INCREMENT = 410
+    DECREMENT = 411
