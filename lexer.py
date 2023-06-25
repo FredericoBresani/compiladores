@@ -6,12 +6,19 @@ class Lexer:
         self.source = source
         self.cursorBegin = 0
         self.cursorEnd = 0
+        self.currentToken = None
         
 
     def nextToken(self):
         token = None
         char = self.source[self.cursorEnd]
-        if char != ';':
+        if char == '\0':
+            token = Token(TokenTypes.EOF, char)
+        if char == '\n':
+            token = None
+        elif char == ' ':
+            token = None
+        elif char == ';':
             token = Token(TokenTypes.SEMICOLON, char)
         elif char == '+':
             token = Token(TokenTypes.PLUS, char)
@@ -41,22 +48,47 @@ class Lexer:
             token = Token(TokenTypes.SEMICOLON, char)
         elif char == ':':
             token = Token(TokenTypes.COLON, char)
+        elif char == '<':
+            token = Token(TokenTypes.LESS, char)
+        elif char == '>':
+            token = Token(TokenTypes.GREATER, char)
+        elif char == '.':
+            token = Token(TokenTypes.POINT, char)
         elif self.isLetter(char):
-            if self.nextCharacter() == 'f':
-
-
-
-
+            while self.isDigit(self.peek()) or self.isLetter(self.peek()):
+                self.nextCharacter()
+            lexema = self.source[self.cursorBegin : self.cursorEnd + 1]
+            tipo = Token.checkToken(lexema) 
+            if tipo == None:
+                token = Token(TokenTypes.IDENTIFIER, lexema)
+            else:
+                token = Token(tipo, lexema)
+        elif self.isDigit(char):
+            while self.isDigit(self.peek()):
+                self.nextCharacter()
+            if self.peek() == '.':
+                self.nextCharacter()
+                if self.isDigit(self.peek()):
+                    while self.isDigit(self.peek()):
+                        self.nextCharacter()
+                else:
+                    self.abort("Esperava por um digito mas encontrei um: "+self.peek())
+            token = Token(TokenTypes.NUMBER, self.source[self.cursorBegin : self.cursorEnd + 1])
+        else:
+            self.abort("Simbolo desconhecido: "+char)
         self.cursorEnd += 1
-        self.cursorBegin = self.cursorEnd 
+        self.cursorBegin = self.cursorEnd
+        self.currentToken = token
         return token
 
     def nextCharacter(self):
         self.cursorEnd += 1
-        return self.source[self.cursorEnd]
+    
+    def peek(self):
+        return self.source[self.cursorEnd + 1]
     
     def isLetter(self, c):
-        if (ord(c) >= 65 and ord(c) <= 90) or ord(c) == 95 or (ord(c) >= 97 and ord(c) <= 122):
+        if (ord(c) >= 65 and ord(c) <= 90) or (ord(c) == 95) or (ord(c) >= 97 and ord(c) <= 122):
             return True
         return False
 
@@ -64,7 +96,12 @@ class Lexer:
         if ord(c) >= 48 and ord(c) <= 57:
             return True
         return False
-            
+    
+    def endOfTerm(self, c):
+        return (not self.isDigit(c)) and (not self.isLetter(c))
+    
+    def abort(self, message):
+        sys.exit("Erro léxico: \n" + message)
 
 
 
@@ -74,12 +111,20 @@ class Token:
     def __init__(self, type, lexeme) -> None:
         self.type = type
         self.lexeme = lexeme
+    @staticmethod
+    def checkToken(lexema):
+        for token in TokenTypes:
+            if token.name == lexema.upper() and token.value < 200 and token.value >= 100:
+                return token
+        return None
 
 class TokenTypes(Enum):
     EOF = -1
     LITERAL = 1
     IDENTIFIER = 2
-    LIB = 112
+    LIB = 3
+    NUMBER = 4
+    POINT = 5
     # RESERVER WORDS ( (100, 200] )
     INCLUDE = 100
     ELSE = 104
@@ -88,11 +133,11 @@ class TokenTypes(Enum):
     FOR = 108
     PRINT = 110
     POW = 111 
-    INT = 200
-    FLOAT = 201
-    DOUBLE = 202
-    STRING = 203
-    LONG = 204
+    INT = 112
+    FLOAT = 113
+    DOUBLE = 114
+    STRING = 115
+    LONG = 116
     # ESPECIAL SYMBOLS ( (300, 400] )
     DOT = 300
     HYFEN = 301
