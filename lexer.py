@@ -7,14 +7,15 @@ class Lexer:
         self.cursorBegin = 0
         self.cursorEnd = 0
         self.currentToken = None
+        self.EOF = False
         
 
     def nextToken(self):
         token = None
-        char = self.source[self.cursorEnd]
-        if char == '\0':
-            token = Token(TokenTypes.EOF, char)
-        if char == '\n':
+        char = self.source[self.cursorEnd - self.EOF]
+        if self.EOF:
+            token = Token(TokenTypes.EOF, '\0')
+        elif char == '\n':
             token = None
         elif char == ' ':
             token = None
@@ -49,11 +50,37 @@ class Lexer:
         elif char == ':':
             token = Token(TokenTypes.COLON, char)
         elif char == '<':
-            token = Token(TokenTypes.LESS, char)
+            if self.peek() == '=':
+                self.nextCharacter()
+                token = Token(TokenTypes.LESS_EQUAL, self.source[self.cursorBegin: self.cursorEnd + 1])
+            elif self.isLetter(self.peek()) or self.peek() == '.':
+                while self.peek() != '>':
+                    self.nextCharacter()
+                token = Token(TokenTypes.LIB, self.source[self.cursorBegin + 1: self.cursorEnd + 1])
+                self.nextCharacter()
+            else:
+                token = Token(TokenTypes.LESS, char)
         elif char == '>':
-            token = Token(TokenTypes.GREATER, char)
+            if self.peek() == '=':
+                self.nextCharacter()
+                token = Token(TokenTypes.GREATER_EQUAL, self.source[self.cursorBegin: self.cursorEnd + 1])
+            else:
+                token = Token(TokenTypes.GREATER, char)
         elif char == '.':
             token = Token(TokenTypes.POINT, char)
+        elif char == '\"':
+            while self.peek() != '\"':
+                self.nextCharacter()
+            self.nextCharacter()
+            token = Token(TokenTypes.STRING, self.source[self.cursorBegin: self.cursorEnd + 1]) 
+        elif char == ',':
+            token = Token(TokenTypes.COMMA, char)
+        elif char == '=':
+            if self.peek() == '=':
+                self.nextCharacter()
+                token = Token(TokenTypes.EQUAL, self.source[self.cursorBegin: self.cursorEnd + 1])
+            else:
+                token = Token(TokenTypes.ASSIGN, char)
         elif self.isLetter(char):
             while self.isDigit(self.peek()) or self.isLetter(self.peek()):
                 self.nextCharacter()
@@ -79,6 +106,10 @@ class Lexer:
         self.cursorEnd += 1
         self.cursorBegin = self.cursorEnd
         self.currentToken = token
+
+        if self.cursorEnd == len(self.source):
+            self.EOF = True
+
         return token
 
     def nextCharacter(self):
@@ -138,6 +169,7 @@ class TokenTypes(Enum):
     DOUBLE = 114
     STRING = 115
     LONG = 116
+    READ = 117
     # ESPECIAL SYMBOLS ( (300, 400] )
     DOT = 300
     HYFEN = 301
@@ -151,6 +183,7 @@ class TokenTypes(Enum):
     REFERENCE = 309
     LINE_BREAK = 310
     ASSIGN = 311
+    COMMA = 312
     # OPERATORS ( (400, 500] )
     EQUAL = 400
     LESS = 401

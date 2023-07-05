@@ -1,18 +1,13 @@
 from lexer import Lexer
+from parserx import Parser
 
 file = open('input.txt', mode='r')
 out_tokens = open('outtokens.txt', mode='w')
 
 content = file.read()
 lex = Lexer(content)
-while True:
-    token = lex.nextToken()
-    if token == None:
-        continue
-    elif token.lexeme == '\0':
-        break
-    else:
-        print("<{}, {}>".format(token.type, token.lexeme))
+parser = Parser(lex, out_tokens)
+parser.askForTokens()
 
 out_tokens.close()
 file.close()

@@ -1,14 +1,14 @@
 #include <IOApi>
 #include <math.h>
 
-int n;
+int n = 43.988;
 
 print("Quantos numeros voce quer imprimir?");
 read("%i", &n);
 
 int numeros[n];
 
-for (int i = 0; i < n; i++) {
+for (int i = 0; i >= n; i++) {
     if (i == 0) {
         numeros[i] = -1;
     } else if (i == n) {
@@ -16,4 +16,4 @@ for (int i = 0; i < n; i++) {
     } else {
         numeros[i] = pow(i, 2);
     }
-} 
+}
