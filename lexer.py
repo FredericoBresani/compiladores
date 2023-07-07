@@ -24,7 +24,12 @@ class Lexer:
         elif char == '+':
             token = Token(TokenTypes.PLUS, char)
         elif char == '-':
-            token = Token(TokenTypes.MINUS, char)
+            if self.isDigit(self.peek()):
+                c = self.peek()
+                self.nextCharacter()
+                token = self.numberToken(c)
+            else:
+                token = Token(TokenTypes.MINUS, char)
         elif char == ']':
             token = Token(TokenTypes.SQUARE_BRACKETS, char)
         elif char == '[':
@@ -56,7 +61,7 @@ class Lexer:
             elif self.isLetter(self.peek()) or self.peek() == '.':
                 while self.peek() != '>':
                     self.nextCharacter()
-                token = Token(TokenTypes.LIB, self.source[self.cursorBegin + 1: self.cursorEnd + 1])
+                token = Token(TokenTypes.LIB, self.source[self.cursorBegin: self.cursorEnd + 2])
                 self.nextCharacter()
             else:
                 token = Token(TokenTypes.LESS, char)
@@ -91,16 +96,7 @@ class Lexer:
             else:
                 token = Token(tipo, lexema)
         elif self.isDigit(char):
-            while self.isDigit(self.peek()):
-                self.nextCharacter()
-            if self.peek() == '.':
-                self.nextCharacter()
-                if self.isDigit(self.peek()):
-                    while self.isDigit(self.peek()):
-                        self.nextCharacter()
-                else:
-                    self.abort("Esperava por um digito mas encontrei um: "+self.peek())
-            token = Token(TokenTypes.NUMBER, self.source[self.cursorBegin : self.cursorEnd + 1])
+            token = self.numberToken(char)
         else:
             self.abort("Simbolo desconhecido: "+char)
         self.cursorEnd += 1
@@ -112,6 +108,20 @@ class Lexer:
 
         return token
 
+
+    def numberToken(self, c):
+        while self.isDigit(self.peek()):
+                self.nextCharacter()
+        if self.peek() == '.':
+            self.nextCharacter()
+            if self.isDigit(self.peek()):
+                while self.isDigit(self.peek()):
+                    self.nextCharacter()
+            else:
+                self.abort("Esperava por um digito mas encontrei um: "+self.peek())
+        token = Token(TokenTypes.NUMBER, self.source[self.cursorBegin : self.cursorEnd + 1])
+        return token
+    
     def nextCharacter(self):
         self.cursorEnd += 1
     

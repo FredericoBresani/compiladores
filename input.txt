@@ -1,7 +1,7 @@
 #include <IOApi>
 #include <math.h>
 
-int n = 43.988;
+int n = 43.88;
 
 print("Quantos numeros voce quer imprimir?");
 read("%i", &n);
