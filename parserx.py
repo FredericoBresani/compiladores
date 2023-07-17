@@ -12,7 +12,9 @@ class Parser:
             if token == None:
                 continue
             elif token.lexeme == '\0':
+                self.writeFile.write("<{}, {}>\n".format(token.type, token.lexeme))
                 print("LEXER FINISHED!!!")
                 break
             else:
                 self.writeFile.write("<{}, {}>\n".format(token.type, token.lexeme))
+            
